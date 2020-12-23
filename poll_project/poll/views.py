@@ -51,7 +51,7 @@ def vote(request, poll_id):
 
         poll.save()
 
-        return redirect("result", poll.id)
+        return redirect("results", poll.id)
     context = {
         "poll" : poll
     }
