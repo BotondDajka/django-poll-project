@@ -26,3 +26,11 @@ class TestViews(TestCase):
 
         self.assertEquals(response.status_code, 200)
         self.assertTemplateUsed(response, "poll/results.html")
+
+
+    def test_poll_non_existant_result_GET(self):
+        url = reverse("results", args=[1])
+
+        response = self.client.get(url)
+
+        self.assertRedirects(response, self.home_url, status_code=302)

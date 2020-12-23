@@ -1,9 +1,13 @@
+from datetime import *
+
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from django.contrib import messages
 
 from .forms import CreatePollForm
 from .models import Poll
-from datetime import *
+
 
 def home(request):
     polls = Poll.objects.all()
@@ -27,8 +31,12 @@ def create(request):
     return render(request,'poll/create.html', context)
 
 def vote(request, poll_id):
-    poll = Poll.objects.get(pk=poll_id)
-    
+    try:
+        poll = Poll.objects.get(pk=poll_id)
+    except:
+        messages.info(request, 'Requested poll does not exist!')
+        return redirect("home")
+
     if request.method == "POST":
         selected_option = request.POST["poll"]
         if selected_option == "option1":
@@ -58,7 +66,12 @@ def vote(request, poll_id):
     return render(request,'poll/vote.html', context)
 
 def results(request, poll_id):
-    poll = Poll.objects.get(pk=poll_id)
+    try:
+        poll = Poll.objects.get(pk=poll_id)
+    except:
+        messages.info(request, 'Requested poll does not exist!')
+        return redirect("home")
+
     context = {
         "poll" : poll
     }
