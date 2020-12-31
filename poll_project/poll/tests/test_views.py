@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse, resolve
 import json
+import random
 
 from poll.models import Poll
 
@@ -60,8 +61,8 @@ class TestViews(TestCase):
 
         input_data = {
             "question": "the question",
-            "option_one": "o1",
-            "option_two": "o2",            
+            "option_one": "01",
+            "option_two": "02",            
             "option_three": "03",
         }
         response = self.client.post(url, data=input_data)
@@ -70,3 +71,29 @@ class TestViews(TestCase):
         actual_value = Poll.objects.values(*input_data.keys())
         expected_value = [input_data]
         self.assertCountEqual(actual_value, expected_value)
+
+    def test_poll_vote_POST(self):
+
+        poll = Poll.objects.create()
+
+        url = reverse("vote", args=[poll.id])
+
+
+        response = self.client.post(url, data={"poll": "option1"})
+        results_url = reverse("results", args=[poll.id])
+        self.assertRedirects(response, results_url, status_code=302)
+
+        response = self.client.post(url, data={"poll": "option2"})
+        results_url = reverse("results", args=[poll.id])
+        self.assertRedirects(response, results_url, status_code=302)
+
+        response = self.client.post(url, data={"poll": "option3"})
+        results_url = reverse("results", args=[poll.id])
+        self.assertRedirects(response, results_url, status_code=302)
+
+        votes = Poll.objects.get(pk=poll.id)
+        self.assertEqual(votes.option_one_count, 1)
+        self.assertEqual(votes.option_two_count, 1)
+        self.assertEqual(votes.option_three_count, 1)
+
+
