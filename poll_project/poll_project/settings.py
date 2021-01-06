@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "poll",
     "widget_tweaks",
     'rest_framework', 
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -50,7 +51,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', 
+    'django.middleware.common.CommonMiddleware'
 ]
 
 ROOT_URLCONF = 'poll_project.urls'
@@ -125,11 +127,8 @@ STATIC_URL = '/static/'
 
 
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework.authentication.TokenAuthentication"
-    ),
-    "DEFAULT_PERMISSION_CLASSES":(
-        "rest_framework.permissions.IsAuthenticated"
-    )
-}
+CORS_ORIGIN_ALLOW_ALL = True # If this is used then `CORS_ORIGIN_WHITELIST` will not have any effect
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:8000',
+]

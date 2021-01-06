@@ -24,9 +24,7 @@ def home(request):
 @csrf_exempt
 def create(request):
     if request.method == "POST":
-        data = json.loads(request.body)
-
-        
+        data = json.loads(request.body)  
         try:
             question = data["question"]
             option_one = data["option_one"]
@@ -45,12 +43,13 @@ def create(request):
                 return HttpResponse(json.dumps([{"Success": "Poll created!"}]), content_type="text/json")
             except:
                 return HttpResponse(json.dumps([{"""Error": "Fields: \'question\', \'option_one\', \'option_two\', \'option_three\' can not be left 
-                    empty"""}]), content_type="text/json")
+                    empty"""}]), content_type="text/json", status=400)
 
         except:
             return HttpResponse(json.dumps([{"Error": "Fields: \'question\', \'option_one\', \'option_two\', \'option_three\' must be defined"}]), 
-                content_type="text/json")
-
+                content_type="text/json", status=400)
+    else:
+        return HttpResponse(json.dumps([{}]), content_type="text/json")
 
 
             #poll.date_lastvote = datetime.now()
@@ -60,7 +59,7 @@ def vote(request, poll_id):
     try:
         poll = Poll.objects.get(pk=poll_id)
     except:
-        return HttpResponse(json.dumps([{"Error": "Poll requested doesn't exist!"}]), content_type="text/json")
+        return HttpResponse(json.dumps([{"Error": "Poll requested doesn't exist!"}]), content_type="text/json", status=400)
 
     if request.method == "GET":
         response = json.dumps([{ "question": poll.question, "option_one": poll.option_one, "option_two": poll.option_two, "option_three": poll.option_three}])     
@@ -89,7 +88,7 @@ def vote(request, poll_id):
             error = 1
 
         if error ==  1:
-            return HttpResponse(json.dumps([{"Error": "Option out of valid range!"}]), content_type="text/json")
+            return HttpResponse(json.dumps([{"Error": "Option out of valid range!"}]), content_type="text/json", status=400)
         else:
             return HttpResponse(json.dumps([{"Success": "Vote posted!"}]), content_type="text/json")
         
@@ -103,4 +102,4 @@ def results(request, poll_id):
         
         return HttpResponse(response, content_type="text/json")
     except:
-        return HttpResponse(json.dumps([{"Error": "Poll requested doesn't exist!"}]), content_type="text/json")
+        return HttpResponse(json.dumps([{"Error": "Poll requested doesn't exist!"}]), content_type="text/json", status=400)
