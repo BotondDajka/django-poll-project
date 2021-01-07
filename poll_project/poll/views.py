@@ -10,9 +10,13 @@ from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework.generics import ListAPIView
+from rest_framework.generics import RetrieveAPIView
 
 from .forms import CreatePollForm
 from .models import Poll
+from .serializers import *
+
 
 
 @csrf_exempt
@@ -20,6 +24,37 @@ def home(request):
     polls = Poll.objects.all()
     response = serializers.serialize('json', polls)
     return HttpResponse(response, content_type="text/json")
+
+
+class PollList(ListAPIView):
+    queryset = Poll.objects.all()
+    serializer_class = PollSerializer
+
+
+class ResultsPollList(RetrieveAPIView):
+    #queryset = Poll.objects.get(pk=1)
+    #queryset = Poll.objects.all()
+    lookup_url_kwarg = "poll_id"
+    serializer_class = ResultsPollSerializer
+
+    def get_queryset(self):
+        poll_id = self.kwargs["poll_id"]
+        poll = Poll.objects.filter(pk=poll_id)
+        return poll
+
+class VotePollList(RetrieveAPIView):
+    #queryset = Poll.objects.get(pk=1)
+    #queryset = Poll.objects.all()
+    lookup_url_kwarg = "poll_id"
+    serializer_class = VotePollSerializer
+
+    def get_queryset(self):
+        poll_id = self.kwargs["poll_id"]
+        poll = Poll.objects.filter(pk=poll_id)
+        return poll
+
+
+
 
 @csrf_exempt
 def create(request):
@@ -97,9 +132,16 @@ def results(request, poll_id):
     response = None
     try:
         poll = Poll.objects.get(pk=poll_id)
-        response = json.dumps([{ "question": poll.question, "option_one": poll.option_one, "option_two": poll.option_two, "option_three": poll.option_three,
-            "option_one_count": poll.option_one_count, "option_two_count": poll.option_two_count, "option_three_count": poll.option_three_count}])     
+        # response = json.dumps([{ "question": poll.question, "option_one": poll.option_one, "option_two": poll.option_two, "option_three": poll.option_three,
+        #     "option_one_count": poll.option_one_count, "option_two_count": poll.option_two_count, "option_three_count": poll.option_three_count}])     
         
+        # return HttpResponse(response, content_type="text/json")
+
+        response = serializers.serialize('json', [poll])
         return HttpResponse(response, content_type="text/json")
-    except:
+
+    except Poll.DoesNotExist:
         return HttpResponse(json.dumps([{"Error": "Poll requested doesn't exist!"}]), content_type="text/json", status=400)
+
+
+
