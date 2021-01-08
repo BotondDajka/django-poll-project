@@ -11,8 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.generics import ListAPIView
-from rest_framework.generics import RetrieveAPIView
+from rest_framework.generics import ListAPIView, RetrieveAPIView, CreateAPIView
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import generics
@@ -27,7 +26,7 @@ from .serializers import *
 
 
 
-@csrf_exempt
+
 def home(request):
     polls = Poll.objects.all()
     response = serializers.serialize('json', polls)
@@ -39,16 +38,19 @@ class PollList(ListAPIView):
     serializer_class = PollSerializer
 
 
-class ResultsPollList(RetrieveAPIView):
+class PollResults(RetrieveAPIView):
     #queryset = Poll.objects.get(pk=1)
     #queryset = Poll.objects.all()
     lookup_url_kwarg = "poll_id"
     serializer_class = ResultsPollSerializer
 
-    def get_queryset(self):
-        poll_id = self.kwargs["poll_id"]
-        poll = Poll.objects.filter(pk=poll_id)
-        return poll
+    # def get_queryset(self):
+    #     poll_id = self.kwargs["poll_id"]
+    #     poll = Poll.objects.filter(pk=poll_id)
+    #     return poll
+    
+    queryset = Poll.objects.all()
+
 
 # class VotePollList(RetrieveAPIView):
 #     #queryset = Poll.objects.get(pk=1)
@@ -62,7 +64,7 @@ class ResultsPollList(RetrieveAPIView):
 #         return poll
 
 
-class VotePollList(generics.RetrieveUpdateAPIView):
+class VotePoll(generics.RetrieveUpdateAPIView):
     lookup_url_kwarg = "poll_id"
     serializer_class = VotePollSerializer
 
@@ -103,43 +105,10 @@ class VotePollList(generics.RetrieveUpdateAPIView):
 
 
 
+class CreatePoll(CreateAPIView):
+    serializer_class = PollSerializer
 
 
-
-@csrf_exempt
-def create(request):
-    if request.method == "POST":
-        data = json.loads(request.body)  
-        try:
-            question = data["question"]
-            option_one = data["option_one"]
-            option_two = data["option_two"]
-            option_three = data["option_three"]
-            
-
-            try:
-                poll = Poll.objects.create()
-                poll.question = question
-                poll.option_one = option_one
-                poll.option_two = option_two
-                poll.option_three = option_three
-                poll.save()
-
-                return HttpResponse(json.dumps([{"Success": "Poll created!"}]), content_type="text/json")
-            except:
-                return HttpResponse(json.dumps([{"""Error": "Fields: \'question\', \'option_one\', \'option_two\', \'option_three\' can not be left 
-                    empty"""}]), content_type="text/json", status=400)
-
-        except:
-            return HttpResponse(json.dumps([{"Error": "Fields: \'question\', \'option_one\', \'option_two\', \'option_three\' must be defined"}]), 
-                content_type="text/json", status=400)
-    else:
-        return HttpResponse(json.dumps([{}]), content_type="text/json")
-
-
-            #poll.date_lastvote = datetime.now()
-
-@csrf_exempt
 def vote(request, poll_id):
     try:
         poll = Poll.objects.get(pk=poll_id)
@@ -177,21 +146,7 @@ def vote(request, poll_id):
         else:
             return HttpResponse(json.dumps([{"Success": "Vote posted!"}]), content_type="text/json")
         
-@csrf_exempt
-def results(request, poll_id):
-    response = None
-    try:
-        poll = Poll.objects.get(pk=poll_id)
-        # response = json.dumps([{ "question": poll.question, "option_one": poll.option_one, "option_two": poll.option_two, "option_three": poll.option_three,
-        #     "option_one_count": poll.option_one_count, "option_two_count": poll.option_two_count, "option_three_count": poll.option_three_count}])     
-        
-        # return HttpResponse(response, content_type="text/json")
 
-        response = serializers.serialize('json', [poll])
-        return HttpResponse(response, content_type="text/json")
-
-    except Poll.DoesNotExist:
-        return HttpResponse(json.dumps([{"Error": "Poll requested doesn't exist!"}]), content_type="text/json", status=400)
 
 
 

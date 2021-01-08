@@ -4,9 +4,11 @@ from .models import Poll
 
 
 class PollSerializer(ModelSerializer):
+   
     class Meta:
         model = Poll
         fields = '__all__'
+        read_only_fields = ["option_one_count", "option_two_count", "option_three_count", "date_lastvote"]
 
 class ResultsPollSerializer(ModelSerializer):
     
@@ -21,7 +23,5 @@ class VotePollSerializer(ModelSerializer):
     class Meta:
         model = Poll
         fields = ["id","option_one_count","option_two_count","option_three_count"]
-
-
 
 
