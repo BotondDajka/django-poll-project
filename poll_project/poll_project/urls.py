@@ -23,7 +23,7 @@ from poll import views as poll_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', poll_views.PollList.as_view(), name="home"),
-    path('create', poll_views.CreatePoll.as_view(), name="create"),
-    path('vote/<poll_id>/', poll_views.VotePoll.as_view(), name="vote"),
+    path('create/', poll_views.CreatePoll.as_view(), name="create"),
+    path('vote/<poll_id>/', poll_views.PollVote.as_view(), name="vote"),
     path('results/<poll_id>/', poll_views.PollResults.as_view(), name="results"),
 ]
