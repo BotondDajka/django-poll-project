@@ -20,4 +20,8 @@ class ResultsPollSerializer(ModelSerializer):
 class VotePollSerializer(ModelSerializer):
     class Meta:
         model = Poll
-        fields = ("id", "question", "option_one", "option_two", "option_three", "date_created", "date_lastvote")
+        fields = ["id","option_one_count","option_two_count","option_three_count"]
+
+
+
+
