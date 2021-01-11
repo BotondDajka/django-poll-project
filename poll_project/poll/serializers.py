@@ -18,8 +18,8 @@ class ResultsPollSerializer(ModelSerializer):
     
     class Meta:
         model = Poll
-        fields = ("id","option_one_count", "option_two_count", "option_three_count", "date_created", "date_lastvote", "option")
-        read_only_fields = ["id","option_one_count", "option_two_count", "option_three_count", "date_created", "date_lastvote"]
+        fields = ("id","question", "option_one", "option_two", "option_three", "option_one_count", "option_two_count", "option_three_count", "date_created", "date_lastvote", "option")
+        read_only_fields = ["id","question", "option_one", "option_two", "option_three", "option_one_count", "option_two_count", "option_three_count", "date_created", "date_lastvote"]
 
     def update(self, instance, validated_data):
         options = ["option_one_count", "option_two_count", "option_three_count"]
